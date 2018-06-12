@@ -2,7 +2,6 @@ import requests
 import sys
 import csv
 import json
-import datetime
 import time
 import string
 import random
