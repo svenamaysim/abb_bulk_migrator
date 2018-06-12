@@ -31,7 +31,7 @@ def getservicedetails(techtype):
   return servicedetails;
 
 def generatepass(size=12, chars=string.ascii_uppercase + string.digits + string.ascii_lowercase):
-  return ''.join(random.choice(chars) for _ in range(size));
+  return "".join(random.choice(chars) for _ in range(size));
 
 # Set API URL
 url = "https://mv-qa.amaysim.net/broadband/orders"
@@ -114,7 +114,7 @@ for row in csv.DictReader(iter(sys.stdin.readline, "")):
 
   data = {}
   data["data"] = dict
-  
+
   payload = json.dumps(data)
   print(payload)
 
