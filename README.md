@@ -1,7 +1,7 @@
 # abb_bulk_migrator
 Broadband Acquisitions Migrator
 
-Takes a CSV from STDIN and prints results to STDOUT
+Takes a CSV piped into STDIN and prints results to a CSV response file.
 
 Calls aBB API (URL in Script)
 

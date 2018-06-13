@@ -33,7 +33,8 @@ def generatepass(size=12, chars=string.ascii_uppercase + string.digits + string.
   return "".join(random.choice(chars) for _ in range(size));
 
 # Set API URL
-url = "https://mv-qa.amaysim.net/broadband/orders"
+api_header = {"content-type": "application/json"}
+api_url = "https://mv-dev.amaysim.net/broadband/orders"
 
 # set static values for payload
 bulk_migration = True
@@ -43,94 +44,127 @@ landline_number = ""
 hardware_product_code = ""
 payment_token = "4239064407821788"
 payment_transaction_id = "6ca51bac-a5e4-4cc9-a2c0-94368cc8f1cd"
+payment_masked_number = "448563******1788"
 payment_card_expiry = "11 / 22"
 
 # generate batch number
 migration_batch_id = time.strftime("%Y%m%d%H%M%S")
+response_filename = "BulkMigrationResponse_" + migration_batch_id + ".csv"
 
-count = 0
-for row in csv.DictReader(iter(sys.stdin.readline, "")):
+
+with open (response_filename,"w", newline="") as f:
+
+  count = 0
+  for row in csv.DictReader(iter(sys.stdin.readline, "")):
  
-  current_id = row["provider_reference_number"]
+    current_id = row["provider_reference_number"]
 
-  # migration data
-  migration_data = { 
-    "migration-batch-id" : migration_batch_id,  
-    "radius-username": row["radius_username"],
-    "radius-password": row["radius_password"],
-    "previous-provider": row["previous_provider"],
-    "provider-reference-number": row["provider_reference_number"],
-    "last-billing-date": row["last_billing_date"]
-  }
+    # migration data
+    migration_data = { 
+      "migration-batch-id" : migration_batch_id,  
+      "radius-username": row["radius_username"],
+      "radius-password": row["radius_password"],
+      "previous-provider": row["previous_provider"],
+      "provider-reference-number": row["provider_reference_number"],
+      "last-billing-date": row["last_billing_date"]
+    }
 
-  broadband_technology = getservicedetails(row["technology_type"])
+    broadband_technology = getservicedetails(row["technology_type"])
 
-  broadband_service_address = {
-    "sub-premises": row["sub_premises"],
-    "street-number": row["street_number"],
-    "street-name": row["street_name"],
-    "street-type": row["street_type"],
-    "city": row["city"],
-    "state": row["state"],
-    "postcode": row["postcode"]
-  }
+    broadband_service_address = {
+     "sub-premises": row["sub_premises"],
+     "street-number": row["street_number"],
+     "street-name": row["street_name"],
+     "street-type": row["street_type"],
+     "city": row["city"],
+     "state": row["state"],
+     "postcode": row["postcode"]
+    }
 
-  billing_address = broadband_service_address
-  delivery_address = broadband_service_address
+    billing_address = broadband_service_address
+    delivery_address = broadband_service_address
 
-  password = generatepass()
+    password = generatepass()
 
-  dict = {}
-  dict["type"] = "orders"
-  dict["attributes"] = { 
-    "bulk-migration": bulk_migration,
-    "migration-data": migration_data,
-    "first-name": row["first_name"],
-    "last-name": row["last_name"],
-    "email": row["email"],
-    "password": password,
-    "date-of-birth": row["date_of_birth"],
-    "contact-number": row["contact_number"],
-    "service-class": broadband_technology["service_class"],
-    "provider": row["wholesale_supplier"],
-    "technology-type": broadband_technology["technology_type"],
-    "technology-type-code": row["technology_type"],
-    "activation-lead-time": broadband_technology["activation_lead_time"],
-    "battery-backup-wanted": battery_backup_wanted,
-    "battery-backup-legals-shown": battery_backup_legals_shown,
-    "landline-number": landline_number,
-    "service-product-code": row["service_product_code"],
-    "hardware-product-code": hardware_product_code,
-    "max_speed": row["max_speed"],
-    "payment-token": payment_token,
-    "payment-transaction-id": payment_transaction_id,
-    "payment-card-expiry": payment_card_expiry,
-    "location-id": row["location_id"],
-    "broadband-service-address": broadband_service_address,
-    "billing-address": billing_address,
-    "delivery-address": delivery_address
-  }
+    dict = {}
+    dict["type"] = "orders"
+    dict["attributes"] = { 
+      "bulk-migration": bulk_migration,
+      "migration-data": migration_data,
+      "first-name": row["first_name"],
+      "last-name": row["last_name"],
+      "email": row["email"],
+      "password": password,
+      "date-of-birth": row["date_of_birth"],
+      "contact-number": row["contact_number"],
+      "service-class": broadband_technology["service_class"],
+      "serviceability-status": broadband_technology["serviceability_status"],
+      "provider": row["wholesale_supplier"],
+      "technology-type": broadband_technology["technology_type"],
+      "technology-type-code": row["technology_type"],
+      "activation_lead_time": broadband_technology["activation_lead_time"],
+#      battery backup fields are only for NBN
+#      "battery-backup-wanted": battery_backup_wanted,
+#      "battery-backup-legals-shown": battery_backup_legals_shown,
+      "landline-number": landline_number,
+      "service-product-code": row["service_product_code"],
+      "hardware-product-code": hardware_product_code,
+      "max-speed": row["max_speed"],
+      "payment-token": payment_token,
+      "payment-transaction-id": payment_transaction_id,
+      "payment-masked-number": payment_masked_number,
+      "payment-card-expiry": payment_card_expiry,
+      "location-id": row["location_id"],
+      "broadband-service-address": broadband_service_address,
+      "billing-address": billing_address,
+      "delivery-address": delivery_address
+    }
 
-  data = {}
-  data["data"] = dict
+    data = {}
+    data["data"] = dict
 
-  payload = json.dumps(data)
-  print(payload)
+    payload = json.dumps(data)
 
-"""
-  headers = {"content-type": "application/json"}
+    print("Attempting API request...")
+    print(payload)
 
-  r = requests.post(url, data = payload, headers = headers )
-  status_code = r.status_code
-  
-  out = row.copy()
-  out["status_code"] = status_code
 
-  writer = csv.writer(sys.stdout)
-  if count == 0:
-    writer.writerow( out.keys( )  )
-    count += 1
+    try:
+      response = requests.post(api_url, data = payload, headers = api_header )
+      response.raise_for_status()
 
-  writer.writerow( out.values() )
-"""
+      resp_obj = response.json()      
+      amaysim_order_id = resp_obj["data"]["id"]
+      status_code = response.status_code
+      result = "SUCCESS"
+      message = "OK"
+    except requests.exceptions.HTTPError as e:
+      print("API request FAILED: ")
+      print(e)
 
+      amaysim_order_id = ""
+      status_code = response.status_code
+      result = "FAIL"
+      message = e.args[0]
+    except requests.exceptions.RequestException as e:
+      print("API request FAILED: " + e)
+
+      amaysim_order_id = ""
+      status_code = ""
+      result = "FAIL"
+      message = "Non-HTTP Request Error"
+      
+    out = row.copy()
+    out["migration_batch_id"] = migration_batch_id
+    out["amaysim_order_id"] = amaysim_order_id
+    out["status_code"] = status_code
+    out["result"] = result
+    out["message"] = message
+    
+    writer = csv.writer(f)
+
+    if count == 0:
+      writer.writerow( out.keys( )  )
+      count += 1
+
+    writer.writerow( out.values() )
