@@ -89,8 +89,8 @@ with open (response_filename,"w", newline="") as f:
     dict = {}
     dict["type"] = "orders"
     dict["attributes"] = { 
-#      "bulk-migration": bulk_migration,
-#      "migration-data": migration_data,
+      "bulk-migration": bulk_migration,
+      "migration-data": migration_data,
       "first-name": row["first_name"],
       "last-name": row["last_name"],
       "email": row["email"],
@@ -103,6 +103,7 @@ with open (response_filename,"w", newline="") as f:
       "technology-type": broadband_technology["technology_type"],
       "technology-type-code": row["technology_type"],
       "activation_lead_time": broadband_technology["activation_lead_time"],
+#      battery backup fields are only for NBN
 #      "battery-backup-wanted": battery_backup_wanted,
 #      "battery-backup-legals-shown": battery_backup_legals_shown,
       "landline-number": landline_number,
