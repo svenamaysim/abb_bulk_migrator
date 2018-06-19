@@ -1,0 +1,2 @@
+provider_reference_number,previous_provider,wholesale_supplier,first_name,last_name,email,date_of_birth,contact_number,technology_type,max_speed,service_product_code,promo_code,last_billing_date,location_id,sub_premises,street_number,street_name,street_type,city,state,postcode,radius_username,radius_password
+201806191235-01,Active Utilities,LBNCO,Test Discount,Test Little Piggy,201806191235@mailinator.com,1990-07-13,0416930734,FTTH,100,12/1-UNL60,DSCT-15OFF6MBASIC60,2018-05-07,1,,22,Elderiana,Link,Banskia Grove,WA,6031,20180613defg,pass123
