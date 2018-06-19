@@ -108,6 +108,7 @@ with open (response_filename,"w", newline="") as f:
 #      "battery-backup-legals-shown": battery_backup_legals_shown,
       "landline-number": landline_number,
       "service-product-code": row["service_product_code"],
+      "promo-code": row["promo_code"],
       "hardware-product-code": hardware_product_code,
       "max-speed": row["max_speed"],
       "payment-token": payment_token,
