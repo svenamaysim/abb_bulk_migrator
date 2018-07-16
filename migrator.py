@@ -34,12 +34,13 @@ def generatepass(size=12, chars=string.ascii_uppercase + string.digits + string.
 
 # Set API URL
 api_header = {"content-type": "application/json"}
-api_url = "https://mv-dev.amaysim.net/broadband/orders"
+api_url = "https://api-dev.amaysim.com.au/broadband/orders"
+
 
 # set static values for payload
-bulk_migration = True
-battery_backup_wanted = False
-battery_backup_legals_shown = True
+bulk_migration = "true"
+battery_backup_wanted = "false"
+battery_backup_legals_shown = "true"
 landline_number = ""
 hardware_product_code = ""
 payment_token = "4239064407821788"
